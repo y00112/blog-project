@@ -1,0 +1,8 @@
+spring:
+  profiles:
+    active: dev
+
+#头像
+comment:
+  avatar: /images/avatar.jpg
+

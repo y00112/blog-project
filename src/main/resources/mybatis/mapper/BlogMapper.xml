@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wukong.mapper.BlogMapper">
+
+    <!--查询博客内容管理列表，完整-->
+    <resultMap id="resultBlog" type="com.wukong.pojo.Blog">
+        <id     column="id"           property="id"></id>
+        <result column="appreciation" property="appreciation"/>
+        <result column="commentable"  property="commentable"/>
+        <result column="content"      property="content"/>
+        <result column="create_time"  property="createTime"/>
+        <result column="first_picture" property="firstPicture"/>
+        <result column="flag"         property="flag"/>
+        <result column="published"    property="published"/>
+        <result column="recommend"    property="recommend"/>
+        <result column="share_statement" property="shareStatement"/>
+        <result column="title"        property="title"/>
+        <result column="update_time"  property="updateTime"/>
+        <result column="views"        property="views"/>
+        <result column="type_id"      property="typeId"/>
+        <result column="description"  property="description"/>
+        <result column="tags_ids"     property="tagIds"/>
+        <result column="user_id"      property="userId"/>
+
+        <!-- 对象-->
+        <association property="user" column="user_id" javaType="com.wukong.pojo.User" select="getUser"/>
+
+        <!-- 集合-->
+        <collection property="type" javaType="com.wukong.pojo.Type" resultMap="typeResult"/>
+
+        <!-- 集合-->
+        <collection property="tags" javaType="com.wukong.pojo.Tag"  resultMap="tagResult"/>
+
+    </resultMap>
+
+    <resultMap id="resultUser" type="com.wukong.pojo.User">
+        <id     column="id" property="id"/>
+        <result column="avatar" property="avatar"/>
+        <result column="email" property="email"/>
+        <result column="nickname" property="nickName"/>
+        <result column="password" property="passWord"/>
+        <result column="type" property="type"/>
+        <result column="username" property="userName"></result>
+    </resultMap>
+
+    <!--查询所有 user-->
+    <select id="getUser" resultMap="resultUser">
+        select id,avatar,email,nickname,password,`type`,username from t_user
+        where id = #{userId}
+    </select>
+
+    <!--查询博客内容，视图渲染-->
+    <resultMap id="resultBlogQuery" type="com.wukong.dto.BlogQuery">
+        <id     column="id"           property="id"></id>
+        <result column="title"        property="title"/>
+        <result column="recommend"    property="recommend"/>
+        <result column="update_time"  property="updateTime"/>
+        <result column="published"    property="published"/>
+        <!-- 一对多-->
+        <collection property="type" javaType="com.wukong.pojo.Type" resultMap="typeResult"/>
+    </resultMap>
+
+    <!--type分类 结果集映射-->
+    <resultMap id="typeResult" type="com.wukong.pojo.Type">
+        <id     column="id" property="id"/>
+        <result column="name" property="name"/>
+    </resultMap>
+
+    <!--tag标签 结果集映射-->
+    <resultMap id="tagResult" type="com.wukong.pojo.Tag">
+        <id     column="id" property="id"/>
+        <result column="name" property="name"/>
+    </resultMap>
+
+    <select id="selectAllBlog" resultMap="resultBlog">
+        <include refid="selectAll"></include>
+    </select>
+
+    <!--查询所有sql-->
+    <sql id="selectAll">
+        select b.id,b.appreciation,b.commentable,b.content,b.create_time,b.first_picture,b.flag,b.published,b.recommend,
+               b.share_statement,b.title,b.update_time,b.views,b.description,b.tags_ids,t.id,t.name,b.type_id,b.user_id from t_blog b
+        left join t_type t on t.id = b.type_id
+        left join t_user u on u.id = b.user_id
+    </sql>
+
+    <!--查询部分sql-->
+    <sql id="selectBlogQuery">
+        select b.id,b.title,b.recommend,b.published,b.update_time,t.id,t.name from t_blog b
+        left join t_type t on  t.id = b.type_id
+    </sql>
+
+    <!--通过id查询blog-->
+    <select id="findById" resultMap="resultBlog">
+        <include refid="selectAll"></include>
+        where b.id = #{id}
+    </select>
+
+
+    <!-- 保存-->
+    <insert id="save">
+        insert into t_blog(
+        <if test="title != null and title != ''">title ,</if>
+        <if test="content != null and content != ''">content,</if>
+        <if test="firstPicture != null and firstPicture != ''">first_picture,</if>
+        <if test="recommend != null">recommend,</if>
+        <if test="flag != null and flag != ''">flag,</if>
+        <if test="shareStatement != null">share_statement ,</if>
+        <if test="appreciation != null">appreciation ,</if>
+        <if test="commentable != null">commentable,</if>
+        <if test="views != null">views,</if>
+        <if test="published != null">published,</if>
+        <if test="createTime != null">create_time,</if>
+        <if test="updateTime != null">update_time,</if>
+        <if test="typeId != null">type_id,</if>
+        <if test="userId != null">user_id,</if>
+        <if test="tagIds != null and tagIds != ''">tags_ids,</if>
+        <if test="description != null and description != ''">description</if>
+        )values(
+        <if test="title != null and title != ''">#{title},</if>
+        <if test="content != null and content != ''">#{content},</if>
+        <if test="firstPicture != null and firstPicture != ''">#{firstPicture},</if>
+        <if test="recommend != null">#{recommend},</if>
+        <if test="flag != null and flag != ''">#{flag},</if>
+        <if test="shareStatement != null"> #{shareStatement},</if>
+        <if test="appreciation != null">#{appreciation},</if>
+        <if test="commentable != null">#{commentable},</if>
+        <if test="published != null"> #{published},</if>
+        <if test="views != null"> #{views},</if>
+        <if test="createTime != null"> #{createTime},</if>
+        <if test="updateTime != null"> #{updateTime},</if>
+        <if test="typeId != null">#{typeId},</if>
+        <if test="userId != null">#{userId},</if>
+        <if test="tagIds != null and tagIds != ''">#{tagIds},</if>
+        <if test="description != null and description != ''">#{description}</if>
+        )
+    </insert>
+
+
+    <!-- 根据条件查询所有blog-->
+    <select id="findAll" resultMap="resultBlog">
+        <include refid="selectAll"/>
+        <where>
+            title like concat('%', #{query}, '%')
+            or
+            content like concat('%', #{query}, '%')
+        </where>
+    </select>
+
+    <!--查询所有blogQuery-->
+    <select id="findBlogQuery" resultMap="resultBlogQuery">
+        <include refid="selectBlogQuery"/>
+    </select>
+
+    <!--通过title 、typeId 和 recommend 查询blog内容-->
+    <select id="getBlogBySearch" parameterType="com.wukong.dto.SearchBlog" resultMap="resultBlogQuery">
+        <bind name="pattern" value="'%' + title + '%'" />
+        select b.id,b.title,b.type_id,t.id,t.name from t_blog b ,t_type t
+        <where>
+            <if test="1 == 1">
+                b.type_id = t.id
+            </if>
+            <if test="typeId != null">
+                and b.type_id = #{typeId}
+            </if>
+            <if test="title != null">
+                and b.title like #{pattern}
+            </if>
+
+        </where>
+    </select>
+
+    <!--更新-->
+    <update id="updateById">
+        update t_blog
+        <set>
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="content != null and content != ''">content = #{content},</if>
+            <if test="firstPicture != null and firstPicture != ''">first_picture = #{firstPicture},</if>
+            <if test="recommend != null">recommend = #{recommend},</if>
+            <if test="flag != null and flag != ''">flag = #{flag},</if>
+            <if test="shareStatement != null">share_statement = #{shareStatement},</if>
+            <if test="appreciation != null">appreciation = #{appreciation},</if>
+            <if test="commentable != null">commentable = #{commentable}, </if>
+            <if test="views != null">views = #{views},</if>
+            <if test="published != null">published = #{published},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="typeId != null">type_id = #{typeId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="tagIds != null and tagIds != ''">tags_ids = #{tagIds},</if>
+            <if test="description != null and description != ''">description= #{description}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--删除-->
+    <delete id="deleteBlogById">
+        delete from t_blog where id = ${id}
+    </delete>
+
+    <!--获取推荐列表 -->
+    <select id="listRecommendBlogTop" resultMap="resultBlog">
+        SELECT id,title FROM t_blog
+        WHERE recommend = TRUE
+        ORDER BY update_time DESC
+        limit 0,4
+    </select>
+
+    <update id="updateViewsById">
+        update t_blog b set b.views = b.views + 1 where b.id = #{id}
+    </update>
+
+    <select id="findBlogByTag" resultMap="resultBlog">
+      <include refid="selectAll"/>
+      where  b.tags_ids  like concat('%', #{id}, '%')
+    </select>
+
+    <select id="listBolgByTypeId" resultMap="resultBlog">
+        <include refid="selectAll"/>
+        where b.type_id = #{id}
+    </select>
+
+    <select id="findGroupByYear" resultType="string">
+        select date_format(b.update_time,'%Y') as year from t_blog b
+        group by year
+        order by year desc
+    </select>
+
+    <select id="findBlogByYear" resultMap="resultBlog">
+        <include refid="selectAll"/>
+        where date_format(b.update_time,'%Y') = #{year}
+    </select>
+
+    <select id="countBlog" resultType="long">
+        select count(*) from t_blog
+    </select>
+</mapper>

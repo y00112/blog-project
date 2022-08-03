@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wukong.mapper.TagMapper">
+    <resultMap type="com.wukong.pojo.Tag" id="tagResult">
+        <id     property="id"       column="id"      />
+        <result property="name"     column="name"      />
+        <collection property="blogs" javaType="com.wukong.pojo.Blog"/>
+    </resultMap>
+
+
+    <insert id="saveTag" parameterType="com.wukong.pojo.Tag">
+       insert into t_tag values (#{id},#{name})
+    </insert>
+
+    <delete id="deleteTag" parameterType="com.wukong.pojo.Tag">
+        delete from t_tag where id = #{id}
+    </delete>
+
+    <update id="updateTag" parameterType="com.wukong.pojo.Tag">
+        update t_tag
+        <set>
+            <if test="name != null and name != ''">`name` = #{name}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="getTagById" resultType="com.wukong.pojo.Tag">
+        select * from t_tag where id = #{id}
+    </select>
+
+    <select id="findAll" parameterType="com.wukong.pojo.Tag" resultMap="tagResult">
+        select * from t_tag
+    </select>
+
+    <select id="getTagByName" resultMap="tagResult">
+        select * from t_tag where `name` = #{name}
+    </select>
+
+</mapper>

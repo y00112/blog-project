@@ -1,0 +1,25 @@
+# 数据库链接
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://47.94.220.33:3306/blog?useUnicode=true&characterEncoding=utf-8
+    username: root
+    password: 123456
+
+# MyBatis配置
+mybatis:
+  # 搜索指定包别名
+  typeAliasesPackage: com.wukong.**.pojo
+  # 配置mapper的扫描，找到所有的mapper.xml映射文件
+  mapperLocations: classpath*:mybatis/mapper/**/*Mapper.xml
+  # 加载全局的配置文件
+  configLocation: classpath:mybatis/mybatis-config.xml
+
+# 日志
+logging:
+  level:
+    root: info
+    com.wukong: debug
+  #配置日志的存放路径
+  file:
+    path: logs/bolg-dev

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wukong.mapper.TypeMapper">
+    <resultMap type="com.wukong.pojo.Type" id="typeResult">
+        <id     property="id"       column="id"      />
+        <result property="name"     column="name"      />
+    </resultMap>
+
+
+    <insert id="saveType" parameterType="com.wukong.pojo.Type">
+       insert into t_type values (#{id},#{name})
+    </insert>
+
+    <delete id="deleteType" parameterType="com.wukong.pojo.Type">
+        delete from t_type where id = #{id}
+    </delete>
+
+    <update id="updateType" parameterType="com.wukong.pojo.Type">
+        update t_type
+        <set>
+            <if test="name != null and name != ''">`name` = #{name}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="getTypeById" resultType="com.wukong.pojo.Type">
+        select * from t_type where id = #{id}
+    </select>
+
+    <select id="findAll" parameterType="com.wukong.pojo.Type" resultMap="typeResult">
+        select * from t_type
+    </select>
+
+    <select id="getTypeByName" resultMap="typeResult">
+        select * from t_type where `name` = #{name}
+    </select>
+
+
+<!--。    <resultMap id="resultOrderByBlogs" type="com.wukong.pojo.Type">-->
+<!--        <result column="num" property="blogs"/>-->
+<!--        <result column="name" property="name"/>-->
+<!--    </resultMap>-->
+
+
+<!--    排序查询 -->
+<!--    <select id="listTypeOrderByBlogs" resultMap="resultOrderByBlogs">-->
+<!--        SELECT COUNT(*) num,t.name-->
+<!--        FROM t_type t,t_blog b-->
+<!--        WHERE b.`type_id` = t.`id`-->
+<!--        GROUP BY t.`name`-->
+<!--        ORDER BY num DESC-->
+<!--    </select>-->
+
+    <!--查询博客内容管理列表，完整-->
+    <resultMap id="resultBlog" type="com.wukong.pojo.Blog">
+        <id     column="id"           property="id"></id>
+        <result column="appreciation" property="appreciation"/>
+        <result column="commentable"  property="commentable"/>
+        <result column="content"      property="content"/>
+        <result column="create_time"  property="createTime"/>
+        <result column="first_picture" property="firstPicture"/>
+        <result column="flag"         property="flag"/>
+        <result column="published"    property="published"/>
+        <result column="recommend"    property="recommend"/>
+        <result column="share_statement" property="shareStatement"/>
+        <result column="title"        property="title"/>
+        <result column="update_time"  property="updateTime"/>
+        <result column="views"        property="views"/>
+        <result column="type_id"      property="typeId"/>
+        <result column="description"  property="description"/>
+        <result column="tags_ids"     property="tagIds"/>
+        <result column="user_id"      property="userId"/>
+
+        <!-- 一对多 集合-->
+        <collection property="type" javaType="com.wukong.pojo.Type" resultMap="typeResult"/>
+
+    </resultMap>
+
+    <resultMap id="resultTypeAndBlogAll" type="com.wukong.pojo.Type">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+    </resultMap>
+
+    <sql id="selectAll">
+        select b.id,b.appreciation,b.commentable,b.content,b.create_time,b.first_picture,b.flag,b.published,b.recommend,
+               b.share_statement,b.title,b.update_time,b.views,b.description,b.tags_ids,t.id,t.name,b.type_id,b.user_id from t_blog b
+                                                                                                                                 left join t_type t on t.id = b.type_id                                                                                                                left join t_user u on u.id = b.user_id
+    </sql>
+
+    <select id="findBlogByTypeId" resultMap="resultBlog">
+        <include refid="selectAll"></include>
+        where type_id = #{typeId}
+    </select>
+
+
+    <select id="findTypeAndBlogAll" resultMap="resultTypeAndBlogAll">
+        select t.id, t.name from t_type t
+    </select>
+</mapper>
